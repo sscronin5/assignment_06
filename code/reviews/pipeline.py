@@ -50,19 +50,29 @@ def sentiment_step(reviews: pd.DataFrame, cache_file: str) -> list:
     offline, and it is what makes the transform steps below fast to debug.
     """
     if os.path.exists(cache_file):
+<<<<<<< HEAD
         with open(cache_file, "r") as f:
             return json.load(f)
 
+=======
+        with open(cache_file) as fh:
+            return json.load(fh)
+>>>>>>> 495d098a0a2fee4d513592c4a416d90888c4cd4a
     documents = []
     for review in reviews.to_dict("records"):
         response = get_sentiment(review["text"])
         document = response["results"]["documents"][0]
         document["review_id"] = review["review_id"]
         documents.append(document)
+<<<<<<< HEAD
 
     with open(cache_file, "w") as f:
         json.dump(documents, f)
 
+=======
+    with open(cache_file, "w") as fh:
+        json.dump(documents, fh)
+>>>>>>> 495d098a0a2fee4d513592c4a416d90888c4cd4a
     return documents
 
 
@@ -73,19 +83,29 @@ def entities_step(reviews: pd.DataFrame, cache_file: str) -> list:
     added. Same cache rule, same loop, `get_entities` instead of `get_sentiment`.
     """
     if os.path.exists(cache_file):
+<<<<<<< HEAD
         with open(cache_file, "r") as f:
             return json.load(f)
 
+=======
+        with open(cache_file) as fh:
+            return json.load(fh)
+>>>>>>> 495d098a0a2fee4d513592c4a416d90888c4cd4a
     documents = []
     for review in reviews.to_dict("records"):
         response = get_entities(review["text"])
         document = response["results"]["documents"][0]
         document["review_id"] = review["review_id"]
         documents.append(document)
+<<<<<<< HEAD
 
     with open(cache_file, "w") as f:
         json.dump(documents, f)
 
+=======
+    with open(cache_file, "w") as fh:
+        json.dump(documents, fh)
+>>>>>>> 495d098a0a2fee4d513592c4a416d90888c4cd4a
     return documents
 
 
@@ -103,6 +123,7 @@ def sentences_table(documents: list) -> pd.DataFrame:
     and `.cumcount()`. Keep only the six columns above. Strip the trailing space
     Azure leaves on `sentence_text` with `.str.strip()`.
     """
+<<<<<<< HEAD
     df = pd.json_normalize(
         documents,
         record_path="sentences",
@@ -120,6 +141,15 @@ def sentences_table(documents: list) -> pd.DataFrame:
     ]]
     df["sentence_text"] = df["sentence_text"].str.strip()
     return df
+=======
+    sentences = pd.json_normalize(documents, record_path="sentences",
+                                  meta=["review_id"], record_prefix="sentence_")
+    sentences["sentence_id"] = sentences.groupby("review_id").cumcount()
+    sentences["sentence_text"] = sentences["sentence_text"].str.strip()
+    columns = ["review_id", "sentence_id", "sentence_text", "sentence_sentiment",
+               "sentence_offset", "sentence_length"]
+    return sentences[columns]
+>>>>>>> 495d098a0a2fee4d513592c4a416d90888c4cd4a
 
 
 def opinions_table(documents: list) -> pd.DataFrame:
@@ -148,6 +178,7 @@ def opinions_table(documents: list) -> pd.DataFrame:
     """
     rows = []
     for document in documents:
+<<<<<<< HEAD
         review_id = document["review_id"]
         for sentence_id, sentence in enumerate(document["sentences"]):
             assessments = sentence.get("assessments", [])
@@ -180,6 +211,28 @@ def opinions_table(documents: list) -> pd.DataFrame:
         "mention_offset",
         "source"
     ])
+=======
+        for sentence_id, sentence in enumerate(document["sentences"]):
+            assessments = sentence.get("assessments", [])
+            for target in sentence.get("targets", []):
+                words = []
+                for relation in target.get("relations", []):
+                    if relation["relationType"] == "assessment":
+                        position = int(relation["ref"].split("/")[-1])
+                        words.append(assessments[position]["text"])
+                rows.append({
+                    "review_id": document["review_id"],
+                    "sentence_id": sentence_id,
+                    "mention": target["text"],
+                    "mention_sentiment": target["sentiment"],
+                    "assessments": ", ".join(words),
+                    "mention_offset": target["offset"],
+                    "source": "opinion",
+                })
+    columns = ["review_id", "sentence_id", "mention", "mention_sentiment",
+               "assessments", "mention_offset", "source"]
+    return pd.DataFrame(rows, columns=columns)
+>>>>>>> 495d098a0a2fee4d513592c4a416d90888c4cd4a
 
 
 def entities_table(documents: list) -> pd.DataFrame:
@@ -194,6 +247,7 @@ def entities_table(documents: list) -> pd.DataFrame:
     `.isin(MENTION_CATEGORIES)` on `entity_category`. A document with no
     entities contributes no rows, which `json_normalize` handles for you.
     """
+<<<<<<< HEAD
     df = pd.json_normalize(
         documents,
         record_path="entities",
@@ -207,6 +261,13 @@ def entities_table(documents: list) -> pd.DataFrame:
         "entity_category",
         "entity_offset"
     ]]
+=======
+    entities = pd.json_normalize(documents, record_path="entities",
+                                 meta=["review_id"], record_prefix="entity_")
+    columns = ["review_id", "entity_text", "entity_category", "entity_offset"]
+    keep = entities["entity_category"].isin(MENTION_CATEGORIES)
+    return entities.loc[keep, columns].reset_index(drop=True)
+>>>>>>> 495d098a0a2fee4d513592c4a416d90888c4cd4a
 
 
 def subjects_step(reviews: pd.DataFrame, mentions: pd.DataFrame,

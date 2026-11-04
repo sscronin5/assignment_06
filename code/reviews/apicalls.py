@@ -100,11 +100,8 @@ def classify_mentions(review_text: str, mentions: list) -> dict:
       mention) and instant after that, because the portal caches every answer.
     - `raise_for_status()`, `return response.json()`.
     """
-    url = f"{BASE_URL}/api/ollama/systemone"
-    headers = {"X-API-KEY": get_api_key()}
-    response = requests.post(url, headers=headers, json=body)
-    response.raise_for_status()
-    return response.json()
+    # TODO: your code here
+    pass
 
 
 def ask_llm(messages: list) -> str:
