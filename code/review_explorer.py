@@ -88,9 +88,6 @@ if asked and question.strip():
                                "sentence_text"]], hide_index=True)
 
 
-
-
-
 # --- The page: the algorithm, step by step ------------------------------------------
 #
 # Every function this page needs is already in the reviews package (imported above),

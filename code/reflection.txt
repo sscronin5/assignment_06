@@ -5,3 +5,58 @@ terminology from this assignment (REST API, endpoint, HTTP status code,
 raise_for_status, API key, form data vs. JSON body, rate limit, caching,
 json_normalize, record_path, meta, grain, opinion mining, named-entity
 recognition, prompt, system prompt, reasoning model), and make it actionable.
+
+
+1. What I did well
+I think one of the things that went well in this lab was following closely to the instructions
+that were present within the docstrings, they gave step by step instructions on how to complete
+each of the functions. This was seen at the lowest level within the apicalls.py file. Many of 
+the functions are similar to one another, they repeat pretty closely, with some minor changes. 
+
+Another thing that went well within this lab, that wasn't about coding exactly, it was more 
+related to problem solving and continuing to preserve what working code I had but fixing the 
+issues. Throughout lab, there were many issues that I delt with, one issues was keeping all 
+of my work in a neat, organized way. I felt that I kept having to add pieces to the top limits 
+such as import functions. By adding these import functions, it removed some of the errors that
+were already present within my code previously. 
+
+Finally, the last thing that I think I did well was crafting the aspects.py file similar to the way 
+that we learned in class. I focused on the entities, subjects, columns, and mentions functions that 
+were distributed throughout the whole file. This was one of the more time constraining parts that 
+I kept having to repeat and redivide more attention to. What I think went well was making sure that 
+each line wasn't too long or messy. I also kept like-functions together, so that it was more organized 
+and less weirdly placed. 
+
+2. What confuses you
+I’m still not fully sure when an endpoint wants form data and when it wants a JSON body. In apicalls.py 
+some functions used data= and others used json=. I mostly followed the docstrings without knowing why 
+each one was different. I also find json_normalize confusing when I have to use record_path and meta 
+together. I understand that record_path points to the nested list that becomes the rows, and meta pulls 
+fields from the parent level down into each row. But I can’t always tell what the grain of the result 
+will be (what one row stands for) until I run it and look at the DataFrame. Last, I’m confused about 
+how much the system prompt changes a model’s output compared to the regular prompt. I’m also not sure 
+when a reasoning model is worth the extra time instead of a regular model. To fix this, I’ll read the 
+API docs for one form-data endpoint and one JSON endpoint side by side. I’ll also try running the same 
+prompt with and without a system prompt to compare the results.
+
+3. Where did you struggle
+I struggled most with debugging failed API calls. At first, when a request failed, my code kept going
+ and broke later with a confusing error about a missing key. Then I learned that calling 
+ raise_for_status() right after the request stops the code at the actual problem and shows 
+ the HTTP status code. That’s how I could tell a 401 (bad or missing API key) from a 429 (rate limit). 
+ I also struggled in aspects.py with getting the opinion mining and named-entity recognition results 
+ into a clean table. The entities and their mentions were nested a few levels deep, and I kept getting 
+ the wrong grain: one row per document when I needed one row per mention. Finally, I wasted API calls 
+ by re-running the same requests over and over while testing. That’s the problem caching solves, and 
+ I should have set up caching earlier instead of hitting the API every time.
+
+4. Where might you need more practice
+I need more practice reading raw JSON responses and planning the json_normalize call before I write it.
+ Next time, I’ll print one response, label which part is the record_path and which fields belong in meta, 
+ and write down the grain I expect. Then I’ll check whether the DataFrame matches. I also want more 
+ practice handling errors on my own instead of relying on the docstrings. That means writing a request 
+ from scratch, deciding where raise_for_status() goes, and handling a 429 by waiting and retrying. Finally, 
+ I want to practice writing prompts: changing the system prompt on purpose and comparing outputs, so I 
+ understand how the prompt shapes the answer. A good next step would be a small script that calls one REST 
+ API endpoint, caches the response to a file, and normalizes it into a DataFrame, all without step-by-step 
+ instructions.
